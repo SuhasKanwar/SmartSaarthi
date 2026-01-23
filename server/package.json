@@ -1,0 +1,36 @@
+{
+  "name": "smartsaarthi-server",
+  "version": "1.0.0",
+  "description": "SmartSaarthi is a multilingual AI voice assistant that intelligently resolves Tier-1 driver and rider queries through natural Hindi conversations. It maintains context across calls, handles real-world noise, and ensures a smooth, confidence-based warm handoff to human agents—preventing frustration and improving resolution quality.",
+  "homepage": "https://github.com/SuhasKanwar/SmartSaarthi#readme",
+  "bugs": {
+    "url": "https://github.com/SuhasKanwar/SmartSaarthi/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SuhasKanwar/SmartSaarthi.git"
+  },
+  "license": "ISC",
+  "author": "Suhas Kanwar",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc --build",
+    "start": "node dist/index.ts",
+    "dev": "npm run build && npm run start"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "pg": "^8.17.2",
+    "prisma": "^7.3.0"
+  }
+}
