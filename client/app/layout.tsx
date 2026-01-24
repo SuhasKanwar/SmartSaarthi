@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ContextProvider from "@/providers/ContextProvider";
 
 export const metadata: Metadata = {
   title: "SmartSaarthi",
@@ -35,7 +36,9 @@ export default function RootLayout({
       <body
         className="antialiased"
       >
-        {children}
+        <ContextProvider>
+          {children}
+        </ContextProvider>
       </body>
     </html>
   );
