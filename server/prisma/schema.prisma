@@ -23,10 +23,10 @@ enum ConversationVariant {
 }
 
 model User {
-  id            String         @id
-  email         String?        @unique
-  name          String?
-  passwordHash  String?
+  id            String         @id @default(uuid())
+  email         String         @unique
+  name          String
+  passwordHash  String
   image         String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt

@@ -1,11 +1,13 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import { PORT } from "./lib/config";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 app.get('/', (req: Request, res: Response) => {
     res.json({
@@ -15,6 +17,8 @@ app.get('/', (req: Request, res: Response) => {
     return;
 });
 
+import authRouter from "./routes/authRouter";
+app.use('/api/auth', authRouter);
 
 app.listen(PORT, (err) => {
     if(err) {

@@ -2,14 +2,14 @@ import { PrismaClient } from "../generated/prisma/client";
 import { DATABASE_URL, NODE_ENV } from "./config";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-let prismaClient;
+let prisma: PrismaClient;
 
 const adapter = new PrismaPg({
   connectionString: DATABASE_URL
 });
 
 if (NODE_ENV !== "development") {
-  prismaClient = new PrismaClient({
+  prisma = new PrismaClient({
     adapter: adapter
   });
 } else {
@@ -18,7 +18,7 @@ if (NODE_ENV !== "development") {
       adapter: adapter
     });
   }
-  prismaClient = global.__prisma;
+  prisma = global.__prisma;
 }
 
-export default prismaClient;
+export default prisma;
