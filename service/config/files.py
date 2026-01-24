@@ -1,0 +1,1 @@
+ALLOWED_FILE_TYPES = {"pdf", "txt", "md", "png", "jpg", "jpeg"}
