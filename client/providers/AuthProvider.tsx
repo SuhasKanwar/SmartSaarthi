@@ -14,7 +14,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const lastRedirectRef = useRef<string | null>(null);
   const prevStatusRef = useRef<typeof status | null>(null);
 
-  const publicAllowed = ["/", "/auth/signin"];
+  const publicAllowed = ["/", "/auth/login"];
 
   useEffect(() => {
     if (

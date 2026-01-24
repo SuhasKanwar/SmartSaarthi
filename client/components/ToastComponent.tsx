@@ -3,26 +3,31 @@ import { AlertCircle, CheckCircle, Info, X, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 const ToastIcon = ({ type }: { type: ToastType }) => {
-  const iconProps = { className: 'w-5 h-5' };
-  
   switch (type) {
     case 'success':
-      return <CheckCircle {...iconProps} className="w-5 h-5 text-green-500" />;
+      return <CheckCircle className="w-5 h-5 text-green-600" />;
     case 'error':
-      return <XCircle {...iconProps} className="w-5 h-5 text-red-500" />;
+      return <XCircle className="w-5 h-5 text-red-600" />;
     case 'warning':
-      return <AlertCircle {...iconProps} className="w-5 h-5 text-orange-500" />;
+      return <AlertCircle className="w-5 h-5 text-orange-600" />;
     case 'info':
-      return <Info {...iconProps} className="w-5 h-5 text-blue-500" />;
+      return <Info className="w-5 h-5 text-blue-600" />;
   }
 };
 
 const ToastComponent = ({ toast, onClose }: { toast: Toast; onClose: () => void }) => {
   const typeStyles = {
-    success: 'bg-green-500/10 border-green-500/20 text-green-100',
-    error: 'bg-red-500/10 border-red-500/20 text-red-100',
-    warning: 'bg-orange-500/10 border-orange-500/20 text-orange-100',
-    info: 'bg-blue-500/10 border-blue-500/20 text-blue-100',
+    success: 'bg-green-50 border-green-200 text-green-800',
+    error: 'bg-red-50 border-red-200 text-red-800',
+    warning: 'bg-orange-50 border-orange-200 text-orange-800',
+    info: 'bg-blue-50 border-blue-200 text-blue-800',
+  };
+
+  const closeButtonStyles = {
+    success: 'text-green-600 hover:text-green-800',
+    error: 'text-red-600 hover:text-red-800',
+    warning: 'text-orange-600 hover:text-orange-800',
+    info: 'text-blue-600 hover:text-blue-800',
   };
 
   return (
@@ -32,7 +37,7 @@ const ToastComponent = ({ toast, onClose }: { toast: Toast; onClose: () => void 
       exit={{ opacity: 0, y: -50, scale: 0.9 }}
       transition={{ duration: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
       className={`
-        flex items-start gap-3 p-4 rounded-xl backdrop-blur-xl border shadow-lg
+        flex items-start gap-3 p-4 rounded-xl border shadow-lg
         ${typeStyles[toast.type]}
         max-w-md w-full
       `}
@@ -46,7 +51,7 @@ const ToastComponent = ({ toast, onClose }: { toast: Toast; onClose: () => void 
       </div>
       <button
         onClick={onClose}
-        className="text-white/60 hover:text-white transition-colors p-1"
+        className={`${closeButtonStyles[toast.type]} transition-colors p-1`}
       >
         <X className="w-4 h-4" />
       </button>

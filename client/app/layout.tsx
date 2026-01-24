@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ContextProvider from "@/providers/ContextProvider";
+import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "SmartSaarthi",
@@ -34,9 +35,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className="antialiased"
+        className="antialiased min-h-screen min-w-screen"
       >
         <ContextProvider>
+          <Navbar />
           {children}
         </ContextProvider>
       </body>
