@@ -41,6 +41,7 @@ export async function signinHandler(req: Request, res: Response) {
             success: true,
             message: "User signed in successfully",
             data: {
+                token,
                 user: {
                     id: user.id,
                     email: user.email,
@@ -94,6 +95,7 @@ export async function signupHandler(req: Request, res: Response) {
             success: true,
             message: "User signed up successfully",
             data: {
+                token,
                 user: {
                     id: newUser.id,
                     email: newUser.email,

@@ -8,7 +8,7 @@ import { PORT } from "./lib/config";
 const app = express();
 
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: "*",
     credentials: true,
 }));
 app.use(express.json());
@@ -28,7 +28,7 @@ import { authenticateMiddleware } from "./middlewares/authentication";
 app.use('/api/auth', authRouter);
 
 app.listen(PORT, (err) => {
-    if(err) {
+    if (err) {
         console.error("Error starting server ->", err);
     } else {
         console.log(`Server is running on port -> ${PORT}`);
