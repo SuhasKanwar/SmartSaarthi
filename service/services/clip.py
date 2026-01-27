@@ -8,7 +8,7 @@ import numpy as np
 from transformers import CLIPProcessor, CLIPModel
 
 from utils.logger import logger
-from utils.exception import SophiaNetException
+from utils.exception import SmartSaarthiException
 
 class ClipService:
     def __init__(self, model_name: str, processor_name: str):
@@ -21,7 +21,7 @@ class ClipService:
             logger.info("CLIP model loaded successfully")
         except Exception as e:
             logger.error(f"Failed to load CLIP model: {str(e)}")
-            raise SophiaNetException(f"Failed to load CLIP model: {str(e)}", sys)
+            raise SmartSaarthiException(f"Failed to load CLIP model: {str(e)}", sys)
     
     def encode_text(self, text: Union[str, List[str]]) -> np.ndarray:
         try:
@@ -39,7 +39,7 @@ class ClipService:
             return embeddings
         except Exception as e:
             logger.error(f"Text encoding error: {str(e)}")
-            raise SophiaNetException(f"Text encoding error: {str(e)}", sys)
+            raise SmartSaarthiException(f"Text encoding error: {str(e)}", sys)
     
     def encode_image(self, image_input: Union[bytes, Image.Image, List[Union[bytes, Image.Image]]]) -> np.ndarray:
         try:
@@ -68,7 +68,7 @@ class ClipService:
             return embeddings
         except Exception as e:
             logger.error(f"Image encoding error: {str(e)}")
-            raise SophiaNetException(f"Image encoding error: {str(e)}", sys)
+            raise SmartSaarthiException(f"Image encoding error: {str(e)}", sys)
     
     def compute_similarity(self, text_embeddings: np.ndarray, image_embeddings: np.ndarray) -> np.ndarray:
         try:
@@ -80,7 +80,7 @@ class ClipService:
             return similarity
         except Exception as e:
             logger.error(f"Similarity computation error: {str(e)}")
-            raise SophiaNetException(f"Similarity computation error: {str(e)}", sys)
+            raise SmartSaarthiException(f"Similarity computation error: {str(e)}", sys)
     
     def find_best_match(self, query: str, image_inputs: List[Union[bytes, Image.Image]]) -> int:
         try:
@@ -94,4 +94,4 @@ class ClipService:
             return int(best_idx)
         except Exception as e:
             logger.error(f"Best match search error: {str(e)}")
-            raise SophiaNetException(f"Best match search error: {str(e)}", sys)
+            raise SmartSaarthiException(f"Best match search error: {str(e)}", sys)

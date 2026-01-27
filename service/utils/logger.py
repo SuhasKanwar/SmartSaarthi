@@ -14,4 +14,4 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-logger = logging.getLogger("SophiaNetLogger")
+logger = logging.getLogger("SmartSaarthiLogger")

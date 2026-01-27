@@ -1,12 +1,12 @@
 from langchain_community.tools import ArxivQueryRun, WikipediaQueryRun, DuckDuckGoSearchResults
 from langchain_community.utilities import ArxivAPIWrapper, WikipediaAPIWrapper, DuckDuckGoSearchAPIWrapper
-from langchain.agents import create_openai_tools_agent, AgentExecutor
-from langchain import hub
+# from langchain.agents import create_openai_tools_agent, AgentExecutor
+# from langchain import hub
 
 class GenericTools:
     def __init__(self, langchain_hub_name: str):
         self.langchain_hub_name = langchain_hub_name
-        self.prompt = hub.pull(self.langchain_hub_name)
+        # self.prompt = hub.pull(self.langchain_hub_name)
 
     def get_wikipedia_tool(self, top_k: int, doc_content_chars_max: int) -> WikipediaQueryRun:
         wikipedia_api_wrapper = WikipediaAPIWrapper(
@@ -40,13 +40,13 @@ class GenericTools:
         return tools
     
     # Not using the agent executor for now, using direct tool binding and chain invocation
-    def get_agent_executor(self, llm) -> AgentExecutor:
-        tools = self.get_generic_tools()
-        agent = create_openai_tools_agent(llm, tools, self.prompt)
-        agent_executor = AgentExecutor(
-            agent=agent,
-            tools=tools,
-            verbose=True,
-            handle_parsing_errors=True
-        )
-        return agent_executor
+    # def get_agent_executor(self, llm) -> AgentExecutor:
+    #     tools = self.get_generic_tools()
+    #     agent = create_openai_tools_agent(llm, tools, self.prompt)
+    #     agent_executor = AgentExecutor(
+    #         agent=agent,
+    #         tools=tools,
+    #         verbose=True,
+    #         handle_parsing_errors=True
+    #     )
+    #     return agent_executor

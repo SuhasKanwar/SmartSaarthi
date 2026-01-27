@@ -5,7 +5,7 @@ import json
 from groq import Groq
 
 from utils.logger import logger
-from utils.exception import SophiaNetException
+from utils.exception import SmartSaarthiException
 
 from config.prompts import ROUTER_MODEL_SYSTEM_PROMPT
 from config.models import ROUTER_MODEL
@@ -41,4 +41,4 @@ class ModelRouter:
             
         except Exception as e:
             logger.error(f"Error routing request: {str(e)}")
-            raise SophiaNetException(f"Failed to route request in Router model ({self.model_name})", sys)
+            raise SmartSaarthiException(f"Failed to route request in Router model ({self.model_name})", sys)

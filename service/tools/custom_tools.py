@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 from config.custom_tools import SCRAPE_WEBSITE_TOOL
 from utils.logger import logger
-from utils.exception import SophiaNetException
+from utils.exception import SmartSaarthiException
 
 load_dotenv()
 os.environ["HF_TOKEN"] = os.getenv("HUGGINGFACE_ACCESS_TOKEN")
@@ -33,4 +33,4 @@ class CustomTools():
             return tool
         except Exception as e:
             logger.error(f"{SCRAPE_WEBSITE_TOOL['name']} tool error: {str(e)}")
-            raise SophiaNetException(f"{SCRAPE_WEBSITE_TOOL['name']} tool error: {str(e)}", sys)
+            raise SmartSaarthiException(f"{SCRAPE_WEBSITE_TOOL['name']} tool error: {str(e)}", sys)

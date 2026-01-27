@@ -2,7 +2,7 @@ import sys
 import os
 
 from utils.logger import logger
-from utils.exception import SophiaNetException
+from utils.exception import SmartSaarthiException
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
@@ -35,7 +35,7 @@ class Llama(RAGService, GenericTools):
             self.chain = self.prompt_template | self.llm
         except Exception as e:
             logger.error(f"Error initializing LLaMA model: {str(e)}")
-            raise SophiaNetException(f"Failed to initialize LLaMA model ({self.model_name})", sys)
+            raise SmartSaarthiException(f"Failed to initialize LLaMA model ({self.model_name})", sys)
 
     def generate_response(self, prompt: str, session_history: list, files: list) -> str:
         try:
@@ -52,4 +52,4 @@ class Llama(RAGService, GenericTools):
             return response.content if hasattr(response, "content") else str(response)
         except Exception as e:
             logger.error(f"Error generating response: {str(e)}")
-            raise SophiaNetException(f"Failed to generate response from LLaMA model ({self.model_name})", sys)
+            raise SmartSaarthiException(f"Failed to generate response from LLaMA model ({self.model_name})", sys)

@@ -16,7 +16,7 @@ export default function Navbar() {
           { label: 'Home', href: '/' },
           { label: 'About', href: '/about' },
           { label: 'Services', href: '/services' },
-          { label: 'Contact', href: '/contact' }
+          { label: 'Bot', href: '/bot' }
         ]}
         activeHref="/"
         className="custom-nav"

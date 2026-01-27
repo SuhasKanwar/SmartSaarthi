@@ -5,7 +5,7 @@ from PIL import Image, ImageFilter, ImageEnhance
 from transformers import BlipProcessor, BlipForConditionalGeneration
 
 from utils.logger import logger
-from utils.exception import SophiaNetException
+from utils.exception import SmartSaarthiException
 
 class ImageCaptioningService:
     def __init__(self, model_name, task, processor_name):
@@ -103,4 +103,4 @@ class ImageCaptioningService:
             return caption
         except Exception as e:
             logger.error(f"Image Captioning error: {str(e)}")
-            raise SophiaNetException(f"Image Captioning error: {str(e)}", sys)
+            raise SmartSaarthiException(f"Image Captioning error: {str(e)}", sys)

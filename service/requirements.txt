@@ -17,3 +17,5 @@ sentence-transformers
 duckduckgo-search
 wikipedia
 arxiv
+pillow
+pytesseract

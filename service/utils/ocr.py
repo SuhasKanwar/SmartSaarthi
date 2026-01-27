@@ -5,7 +5,7 @@ from typing import List, Dict
 
 import pytesseract
 
-from utils.exception import SophiaNetException
+from utils.exception import SmartSaarthiException
 
 def get_text(files: List[Dict]) -> str:
     if not files:
@@ -27,7 +27,7 @@ def get_text(files: List[Dict]) -> str:
             if cleaned:
                 results.append(f"File: {name}\n{cleaned}")
         except Exception as e:
-            raise SophiaNetException(f"Failed to process file {name}: {str(e)}", sys)
+            raise SmartSaarthiException(f"Failed to process file {name}: {str(e)}", sys)
     if not results:
         return "No extractable text found in provided images."
     return "\n\n".join(results)
