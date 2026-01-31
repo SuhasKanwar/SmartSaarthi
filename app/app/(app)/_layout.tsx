@@ -1,22 +1,33 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/theme';
+import CustomTabBar from '@/components/CustomTabBar';
 
 export default function AppLayout() {
     return (
         <Tabs
+            tabBar={props => <CustomTabBar {...props} />}
             screenOptions={{
-                tabBarActiveTintColor: Colors.light.tint,
-                headerShown: true,
+                headerShown: false,
+                tabBarHideOnKeyboard: true,
             }}
         >
             <Tabs.Screen
                 name="index"
                 options={{
                     title: 'Home',
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="home-outline" size={size} color={color} />
-                    ),
+                }}
+            />
+            <Tabs.Screen
+                name="voice"
+                options={{
+                    title: 'Voice',
+                }}
+            />
+            <Tabs.Screen
+                name="settings"
+                options={{
+                    title: 'Settings',
                 }}
             />
         </Tabs>

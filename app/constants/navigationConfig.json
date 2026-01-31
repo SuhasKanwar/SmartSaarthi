@@ -1,0 +1,20 @@
+[
+  {
+    "name": "home",
+    "label": "Home",
+    "icon": "home",
+    "route": "index"
+  },
+  {
+    "name": "voice",
+    "label": "Voice",
+    "icon": "mic",
+    "route": "voice"
+  },
+  {
+    "name": "settings",
+    "label": "Settings",
+    "icon": "settings",
+    "route": "settings"
+  }
+]

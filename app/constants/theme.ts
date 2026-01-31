@@ -16,6 +16,11 @@ export const Colors = {
     icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: tintColorLight,
+    brand: {
+      primary: '#2C59FF',
+      secondary: '#01109F',
+      accent: '#00CE7D',
+    }
   },
   dark: {
     text: '#ECEDEE',
@@ -24,7 +29,18 @@ export const Colors = {
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
+    brand: {
+      primary: '#2C59FF',
+      secondary: '#01109F',
+      accent: '#00CE7D',
+    }
   },
+};
+
+export const Palette = {
+  bluePrimary: '#2C59FF',
+  blueSecondary: '#01109F',
+  green: '#00CE7D',
 };
 
 export const Fonts = Platform.select({
