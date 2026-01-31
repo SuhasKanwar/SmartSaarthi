@@ -115,7 +115,8 @@ export const getConversationMessages = async (req: Request, res: Response) => {
         const formatted = messages.map(m => ({
             id: m.id,
             text: m.content,
-            sender: m.sender
+            sender: m.sender,
+            metadata: m.metadata
         }));
 
         res.json({ success: true, messages: formatted });
@@ -194,13 +195,24 @@ export const sendMessage = async (req: Request, res: Response) => {
             mimetype: f.mimetype
         }));
 
-        // 5. Call Microservice
-        let aiResponseText = "";
-        try {
-            aiResponseText = await generateChatResponse(messageText, history, microserviceFiles);
-        } catch (err) {
-            aiResponseText = "I'm sorry, I'm having trouble connecting to my brain right now.";
+        let userLocation = undefined;
+        if (req.body.location) {
+            try {
+                userLocation = JSON.parse(req.body.location);
+            } catch (e) {
+                console.error("Failed to parse location", e);
+            }
         }
+
+        // 5. Call Microservice
+        let aiResponse = { content: "" } as any; // Init default
+        try {
+            aiResponse = await generateChatResponse(messageText, history, microserviceFiles, userLocation);
+        } catch (err) {
+            aiResponse = { content: "I'm sorry, I'm having trouble connecting to my brain right now." };
+        }
+
+        const aiResponseText = aiResponse.content || "";
 
         // 6. Save AI Response
         const botMessage = await prisma.chat.create({
@@ -209,7 +221,13 @@ export const sendMessage = async (req: Request, res: Response) => {
                 content: aiResponseText,
                 sender: 'bot',
                 type: 'text',
-                model: 'llama'
+                model: 'llama',
+                metadata: aiResponse.action === 'OPEN_MAPS' ? {
+                    location: aiResponse.location,
+                    action: aiResponse.action,
+                    place_name: aiResponse.place_name,
+                    address: aiResponse.address
+                } : undefined
             }
         });
 
@@ -229,7 +247,16 @@ export const sendMessage = async (req: Request, res: Response) => {
             // Non-blocking, continue without audio
         }
 
-        res.json({ success: true, userMessage, botMessage, audio: audioBase64 });
+        res.json({
+            success: true,
+            userMessage,
+            botMessage,
+            audio: audioBase64,
+            location: aiResponse.location,
+            action: aiResponse.action,
+            place_name: aiResponse.place_name,
+            address: aiResponse.address
+        });
 
     } catch (error) {
         console.error("Error sending message:", error);

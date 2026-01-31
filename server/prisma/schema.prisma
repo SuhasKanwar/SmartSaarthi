@@ -59,6 +59,7 @@ model Chat {
   sender         Sender
   model          String?
   content        String?
+  metadata       Json?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

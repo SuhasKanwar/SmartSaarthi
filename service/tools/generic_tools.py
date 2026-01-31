@@ -1,5 +1,6 @@
 from langchain_community.tools import ArxivQueryRun, WikipediaQueryRun, DuckDuckGoSearchResults
 from langchain_community.utilities import ArxivAPIWrapper, WikipediaAPIWrapper, DuckDuckGoSearchAPIWrapper
+from tools.google_maps_tool import GoogleMapsTools
 # from langchain.agents import create_openai_tools_agent, AgentExecutor
 # from langchain import hub
 
@@ -31,12 +32,16 @@ class GenericTools:
         duckduckgo = DuckDuckGoSearchResults(api_wrapper=duckduckgo_api_wrapper)
         return duckduckgo
     
+
+
     def get_generic_tools(self, top_k: int = 3, doc_content_chars_max: int = 1000, max_results: int = 3) -> list:
         wikipedia_tool = self.get_wikipedia_tool(top_k, doc_content_chars_max)
         arxiv_tool = self.get_arxiv_tool(top_k, doc_content_chars_max)
         duckduckgo_tool = self.get_duckduckgo_tool(max_results)
+        
+        gmaps_tools = GoogleMapsTools().get_tools()
 
-        tools = [wikipedia_tool, arxiv_tool, duckduckgo_tool]
+        tools = [wikipedia_tool, arxiv_tool, duckduckgo_tool, *gmaps_tools]
         return tools
     
     # Not using the agent executor for now, using direct tool binding and chain invocation

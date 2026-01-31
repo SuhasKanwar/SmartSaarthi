@@ -1,5 +1,7 @@
+import * as Location from 'expo-location';
+
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Alert, Dimensions, KeyboardAvoidingView, Platform, Keyboard, FlatList, Modal, Linking } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Alert, Dimensions, KeyboardAvoidingView, Platform, Keyboard, FlatList, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Orb from '@/components/Orb';
 import { Palette } from '@/constants/theme';
@@ -18,6 +20,7 @@ interface Message {
     id: string;
     text: string;
     sender: 'user' | 'bot';
+    metadata?: any;
 }
 
 interface Conversation {
@@ -41,6 +44,8 @@ export default function VoiceScreen() {
   const [selectedFile, setSelectedFile] = useState<any>(null); // { uri, name, mimeType }
   const [audioSource, setAudioSource] = useState<any>(null);
 
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | undefined>(undefined);
+
   const player = useAudioPlayer(audioSource);
   const playerStatus = useAudioPlayerStatus(player);
   
@@ -52,7 +57,26 @@ export default function VoiceScreen() {
   useEffect(() => {
     initConversation();
     fetchHistory();
+    requestLocationPermission();
   }, []);
+
+  const requestLocationPermission = async () => {
+      try {
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status !== 'granted') {
+              console.log('Permission to access location was denied');
+              return;
+          }
+
+          const location = await Location.getCurrentPositionAsync({});
+          setUserLocation({
+              lat: location.coords.latitude,
+              lng: location.coords.longitude
+          });
+      } catch (err) {
+          console.log("Error getting location", err);
+      }
+  };
 
   useEffect(() => {
       if (player && audioSource) {
@@ -220,7 +244,7 @@ export default function VoiceScreen() {
 
         setLoading(true);
         try {
-            const res = await sendMessage(conversationId, text, fileToSend);
+            const res = await sendMessage(conversationId, text, undefined, userLocation);
             if (res.success && res.botMessage) {
                 setMessages(prev => [...prev, { 
                     id: res.botMessage.id || Date.now().toString(), 
@@ -232,6 +256,11 @@ export default function VoiceScreen() {
                     playAudio(res.audio);
                 } else {
                     speak(res.botMessage.content);
+                }
+
+                // Handle Location Action
+                if (res.location) {
+                    openMap(res.location, res.place_name || "Location");
                 }
 
                 // Refresh history title if first msg
@@ -304,6 +333,32 @@ export default function VoiceScreen() {
       }
   };
 
+  const openMap = (location: { lat: number, lng: number }, label?: string) => {
+      const scheme = Platform.select({ ios: 'maps:', android: 'geo:' });
+      // const url = Platform.select({
+      //   ios: `${scheme}?q=${label}&ll=${location.lat},${location.lng}`,
+      //   android: `${scheme}${location.lat},${location.lng}?q=${location.lat},${location.lng}(${label})`
+      // });
+      
+      // Use Google Maps Universal URL for consistency if needed, or intent
+      const latLng = `${location.lat},${location.lng}`;
+      const url = Platform.select({
+          ios: `comgooglemaps://?q=${label}&center=${latLng}`, // Requires Google Maps installed on iOS, fallback to apple maps
+          android: `geo:${latLng}?q=${latLng}(${label})`
+      });
+
+      // Simple fallback to universal link if schemes fail or just use web
+      const webUrl = `https://www.google.com/maps/search/?api=1&query=${latLng}`;
+      
+      Linking.canOpenURL(url || webUrl).then((supported: boolean) => {
+          if (supported && url) {
+              Linking.openURL(url);
+          } else {
+              Linking.openURL(webUrl);
+          }
+      });
+  };
+
   const sendVoiceMessage = async (uri: string) => {
       if (!conversationId) {
           Alert.alert("Error", "No active session.");
@@ -326,7 +381,7 @@ export default function VoiceScreen() {
 
       setLoading(true);
       try {
-          const res = await sendMessage(conversationId, "", file);
+          const res = await sendMessage(conversationId, "", file, userLocation);
           if (res.success && res.botMessage) {
               setMessages(prev => [...prev, { 
                   id: res.botMessage.id || Date.now().toString(), 
@@ -339,6 +394,12 @@ export default function VoiceScreen() {
               } else {
                   speak(res.botMessage.content);
               }
+              
+              // Handle Location Action
+              if (res.location) {
+                  openMap(res.location, res.place_name || "Location");
+              }
+
               if (messages.length === 0) fetchHistory(); 
           }
       } catch (err) {

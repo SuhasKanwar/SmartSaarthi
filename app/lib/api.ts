@@ -82,12 +82,16 @@ export const getConversationMessages = async (id: string) => {
     }
 };
 
-export const sendMessage = async (conversationId: string, content: string, file?: any) => {
+export const sendMessage = async (conversationId: string, content: string, file?: any, location?: { lat: number; lng: number }) => {
     try {
         // Use FormData to support files
         const formData = new FormData();
         formData.append('conversationId', conversationId);
         formData.append('content', content || ""); // Ensure content is string
+
+        if (location) {
+            formData.append('location', JSON.stringify(location));
+        }
 
         if (file) {
             // file object from expo-document-picker: { uri, name, mimeType }

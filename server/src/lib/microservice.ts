@@ -13,15 +13,28 @@ export interface MicroserviceFile {
     mimetype: string;
 }
 
+export interface MicroserviceResponse {
+    content: string;
+    location?: { lat: number; lng: number };
+    action?: string;
+    place_name?: string;
+    address?: string;
+}
+
 export const generateChatResponse = async (
     prompt: string,
     history: SessionMessage[],
-    files: MicroserviceFile[] = []
-): Promise<string> => {
+    files: MicroserviceFile[] = [],
+    location?: { lat: number; lng: number }
+): Promise<MicroserviceResponse> => {
     try {
         const formData = new FormData();
         formData.append('prompt', prompt);
         formData.append('session_history', JSON.stringify(history));
+
+        if (location) {
+            formData.append('location', JSON.stringify(location));
+        }
 
         files.forEach((file) => {
             formData.append('files', file.buffer, {
@@ -37,7 +50,12 @@ export const generateChatResponse = async (
         });
 
         if (response.data && response.data.response) {
-            return response.data.response;
+            // Handle both string (legacy/error) and object (structured) responses
+            const resp = response.data.response;
+            if (typeof resp === 'string') {
+                return { content: resp };
+            }
+            return resp as MicroserviceResponse;
         } else {
             throw new Error("Invalid response format from microservice");
         }

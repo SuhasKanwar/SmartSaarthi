@@ -133,6 +133,10 @@ async def generate_chat(request: fastapi.Request) -> dict:
             session_history_str = form.get("session_history", "[]")
             session_history_raw = json.loads(session_history_str) if session_history_str else []
             uploads_raw = form.getlist("files") or []
+            
+            location_str = form.get("location")
+            location = json.loads(location_str) if location_str else None
+
             files_payload = []
             for f in uploads_raw:
                 if hasattr(f, "filename"):
@@ -143,6 +147,8 @@ async def generate_chat(request: fastapi.Request) -> dict:
             prompt = data.get("prompt", "").strip()
             session_history_raw = data.get("session_history", [])
             json_files = data.get("files", []) or []
+            location = data.get("location") # Expecting dict or None
+
             files_payload = []
             for f in json_files:
                 if isinstance(f, dict):
@@ -158,7 +164,7 @@ async def generate_chat(request: fastapi.Request) -> dict:
         if not prompt:
             raise SmartSaarthiException("Prompt is required.")
 
-        response = llama.generate_response(prompt, session_history, files_payload)
+        response = llama.generate_response(prompt, session_history, files_payload, location)
 
         return {
             "status": 200,
