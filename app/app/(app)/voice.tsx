@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Orb from '@/components/Orb';
 import { Palette } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
+import { useAudioPlayer, useAudioPlayerStatus, useAudioRecorder, requestRecordingPermissionsAsync } from 'expo-audio';
 import * as Speech from 'expo-speech';
 import * as DocumentPicker from 'expo-document-picker';
 import { createConversation, sendMessage, getConversations, deleteConversation, renameConversation, getConversationMessages } from '@/lib/api';
@@ -251,14 +251,101 @@ export default function VoiceScreen() {
       }
   }, [messages, isChatOpen]);
 
-  const toggleListening = () => {
-      setIsListening(true);
-      // Fallback to text input for now
-      setTimeout(() => {
+  // Audio Recording
+  const recordingOptions: any = {
+      extension: '.m4a',
+      sampleRate: 44100,
+      numberOfChannels: 2,
+      bitRate: 128000,
+      android: {
+          extension: '.m4a',
+          outputFormat: 'mpeg4',
+          audioEncoder: 'aac',
+          sampleRate: 44100,
+          numberOfChannels: 2,
+          bitRate: 128000,
+      },
+      ios: {
+          extension: '.m4a',
+          audioQuality: 127,
+          sampleRate: 44100,
+          numberOfChannels: 2,
+          bitRate: 128000,
+          linearPCMBitDepth: 16,
+          linearPCMIsBigEndian: false,
+          linearPCMIsFloat: false,
+      },
+      web: {
+          mimeType: 'audio/webm',
+          bitsPerSecond: 128000,
+      },
+  };
+
+  const recorder = useAudioRecorder(recordingOptions, (status) => {
+     // Optional: track duration or metering here if needed
+  });
+
+  const toggleListening = async () => {
+      if (isListening) {
+          await recorder.stop();
           setIsListening(false);
-          setIsChatOpen(true);
-          setTimeout(() => inputRef.current?.focus(), 300);
-      }, 600);
+          
+          if (recorder.uri) {
+              sendVoiceMessage(recorder.uri);
+          }
+      } else {
+          const perm = await requestRecordingPermissionsAsync();
+          if (perm.granted) {
+             setIsListening(true);
+             recorder.record();
+          } else {
+             Alert.alert("Permission required", "Microphone access is needed.");
+          }
+      }
+  };
+
+  const sendVoiceMessage = async (uri: string) => {
+      if (!conversationId) {
+          Alert.alert("Error", "No active session.");
+          return;
+      }
+      
+      // Create file object
+      const file = {
+          uri: uri,
+          name: 'voice_message.m4a',
+          type: 'audio/m4a'
+      };
+
+      // Optimistic update
+      setMessages(prev => [...prev, { 
+          id: Date.now().toString(), 
+          text: "[Voice Message]", 
+          sender: 'user' 
+      }]);
+
+      setLoading(true);
+      try {
+          const res = await sendMessage(conversationId, "", file);
+          if (res.success && res.botMessage) {
+              setMessages(prev => [...prev, { 
+                  id: res.botMessage.id || Date.now().toString(), 
+                  text: res.botMessage.content, 
+                  sender: 'bot' 
+              }]);
+              
+              if (res.audio) {
+                  playAudio(res.audio);
+              } else {
+                  speak(res.botMessage.content);
+              }
+              if (messages.length === 0) fetchHistory(); 
+          }
+      } catch (err) {
+          Alert.alert("Error", "Failed to send voice.");
+      } finally {
+          setLoading(false);
+      }
   };
 
   const drawerStyle = useAnimatedStyle(() => {
