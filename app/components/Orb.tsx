@@ -5,7 +5,6 @@ import Animated, {
   useAnimatedStyle,
   withRepeat,
   withTiming,
-  withOneOf,
   Easing,
   interpolate,
   useDerivedValue,
