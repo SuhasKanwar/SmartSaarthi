@@ -29,7 +29,7 @@ import chatRouter from "./routes/chatRouter";
 import { authenticateMiddleware } from "./middlewares/authentication";
 app.use('/api/auth', authRouter);
 app.use('/api/chat', chatRouter);
-app.use('/api/user', (req: Request, res: Response) => {
+app.get('/api/user', (req: Request, res: Response) => {
     try {
         res.json({
             success: true,
