@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Orb from '@/components/Orb';
 import { Palette } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
 import * as DocumentPicker from 'expo-document-picker';
 import { createConversation, sendMessage, getConversations, deleteConversation, renameConversation, getConversationMessages } from '@/lib/api';
@@ -47,7 +48,29 @@ export default function VoiceScreen() {
   useEffect(() => {
     initConversation();
     fetchHistory();
+    Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: false,
+    });
   }, []);
+
+  const playAudio = async (base64Data: string) => {
+      try {
+          const { sound } = await Audio.Sound.createAsync({
+              uri: `data:audio/mp3;base64,${base64Data}`
+          });
+          setIsSpeaking(true);
+          sound.setOnPlaybackStatusUpdate((status) => {
+              if (status.isLoaded && status.didJustFinish) {
+                  setIsSpeaking(false);
+              }
+          });
+          await sound.playAsync();
+      } catch (error) {
+          console.error("Error playing audio:", error);
+          setIsSpeaking(false);
+      }
+  };
 
   // Chat Drawer Animation
   useEffect(() => {
@@ -208,7 +231,13 @@ export default function VoiceScreen() {
                     text: res.botMessage.content, 
                     sender: 'bot' 
                 }]);
-                speak(res.botMessage.content);
+                
+                if (res.audio) {
+                    playAudio(res.audio);
+                } else {
+                    speak(res.botMessage.content);
+                }
+
                 // Refresh history title if first msg
                 if (messages.length === 0) fetchHistory(); 
             }

@@ -141,10 +141,7 @@ const styles = StyleSheet.create({
     width: ORB_SIZE,
     height: ORB_SIZE,
     overflow: 'hidden',
-    shadowColor: '#9C43FE',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 30,
+    boxShadow: '0px 0px 30px 0px rgba(156, 67, 254, 0.6)',
     elevation: 15,
   },
   glowContainer: {

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { generateChatResponse, MicroserviceFile, SessionMessage } from "../lib/microservice";
+import { generateSpeech } from "../lib/elevenlabs";
 
 interface MulterRequest extends Request {
     files?: Express.Multer.File[];
@@ -218,7 +219,17 @@ export const sendMessage = async (req: Request, res: Response) => {
             data: { lastUpdated: new Date() }
         });
 
-        res.json({ success: true, userMessage, botMessage });
+        // 8. Generate Speech (ElevenLabs)
+        let audioBase64 = null;
+        try {
+            const audioBuffer = await generateSpeech(aiResponseText);
+            audioBase64 = audioBuffer.toString('base64');
+        } catch (speechError) {
+            console.error("TTS Error:", speechError);
+            // Non-blocking, continue without audio
+        }
+
+        res.json({ success: true, userMessage, botMessage, audio: audioBase64 });
 
     } catch (error) {
         console.error("Error sending message:", error);
