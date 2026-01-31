@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Orb from '@/components/Orb';
 import { Palette } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { Audio } from 'expo-av';
+import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import * as Speech from 'expo-speech';
 import * as DocumentPicker from 'expo-document-picker';
 import { createConversation, sendMessage, getConversations, deleteConversation, renameConversation, getConversationMessages } from '@/lib/api';
@@ -39,6 +39,10 @@ export default function VoiceScreen() {
   const [editingConvoId, setEditingConvoId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [selectedFile, setSelectedFile] = useState<any>(null); // { uri, name, mimeType }
+  const [audioSource, setAudioSource] = useState<any>(null);
+
+  const player = useAudioPlayer(audioSource);
+  const playerStatus = useAudioPlayerStatus(player);
   
   const scrollViewRef = useRef<ScrollView>(null);
   const drawerTranslateY = useSharedValue(DRAWER_HEIGHT);
@@ -48,28 +52,20 @@ export default function VoiceScreen() {
   useEffect(() => {
     initConversation();
     fetchHistory();
-    Audio.setAudioModeAsync({
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: false,
-    });
   }, []);
 
-  const playAudio = async (base64Data: string) => {
-      try {
-          const { sound } = await Audio.Sound.createAsync({
-              uri: `data:audio/mp3;base64,${base64Data}`
-          });
-          setIsSpeaking(true);
-          sound.setOnPlaybackStatusUpdate((status) => {
-              if (status.isLoaded && status.didJustFinish) {
-                  setIsSpeaking(false);
-              }
-          });
-          await sound.playAsync();
-      } catch (error) {
-          console.error("Error playing audio:", error);
-          setIsSpeaking(false);
+  useEffect(() => {
+      if (player && audioSource) {
+          player.play();
       }
+  }, [player, audioSource]);
+
+  useEffect(() => {
+      setIsSpeaking(playerStatus.playing);
+  }, [playerStatus.playing]);
+
+  const playAudio = async (base64Data: string) => {
+      setAudioSource({ uri: `data:audio/mp3;base64,${base64Data}` });
   };
 
   // Chat Drawer Animation
