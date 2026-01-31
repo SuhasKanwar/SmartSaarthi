@@ -590,6 +590,16 @@ export default function VoiceScreen() {
                             ]}>
                                 {msg.text}
                             </Text>
+
+                            {msg.metadata?.action === 'OPEN_MAPS' && msg.metadata.location && (
+                                <TouchableOpacity 
+                                    style={styles.mapButton} 
+                                    onPress={() => openMap(msg.metadata.location, msg.metadata.place_name)}
+                                >
+                                    <Ionicons name="map" size={16} color="#fff" />
+                                    <Text style={styles.mapButtonText}>View Location</Text>
+                                </TouchableOpacity>
+                            )}
                         </View>
                     ))}
                     {loading && (
@@ -926,5 +936,20 @@ const styles = StyleSheet.create({
       marginLeft: 8,
       fontSize: 14,
       color: Palette.blueSecondary,
+  },
+  mapButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: Palette.green,
+      padding: 8,
+      borderRadius: 12,
+      marginTop: 8,
+      alignSelf: 'flex-start',
+  },
+  mapButtonText: {
+      color: '#fff',
+      marginLeft: 6,
+      fontSize: 14,
+      fontWeight: '600',
   },
 });

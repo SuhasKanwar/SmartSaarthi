@@ -63,7 +63,7 @@ class GoogleMapsTools:
             return {"status": "error", "message": str(e)}
 
     @tool
-    def find_places_nearby(keyword: str, location: str, radius: int = 5000):
+    def find_places_nearby(keyword: str, location: str, radius: int | str = 5000):
         """
         Search for nearby places using Google Maps Places API.
         Args:
@@ -81,7 +81,7 @@ class GoogleMapsTools:
             
             # Parse location string to dict or tuple if needed, but client might accept string "lat,lng"
             # googlemaps python client expects location as (lat, lng) tuple or dict or string "lat,lng"
-            
+            radius = int(radius)
             result = gmaps.places_nearby(location=location, keyword=keyword, radius=radius)
             
             if result['status'] == 'OK' and result['results']:

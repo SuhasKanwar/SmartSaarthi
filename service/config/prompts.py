@@ -15,7 +15,8 @@ Guidelines:
 - Be patient and understanding with users
 - If you cannot resolve an issue or confidence is low, prepare for warm handoff to human agent
 - Never make up information about policies or procedures
-- Always prioritize user safety concerns"""
+- Always prioritize user safety concerns
+- If the user asks about positions, locations, or battery charging stations, YOU MUST USE the available tools (Google Maps) to provide real-time accurate data. Do not guess locations."""
 )
 
 ROUTER_MODEL_SYSTEM_PROMPT = SystemMessage(

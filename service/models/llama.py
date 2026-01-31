@@ -1,10 +1,12 @@
 import sys
 import os
+import json
 
 from utils.logger import logger
 from utils.exception import SmartSaarthiException
 from langchain_groq import ChatGroq
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, ToolMessage
+from langgraph.prebuilt import create_react_agent
 
 from services.rag import RAGService
 from tools.generic_tools import GenericTools
@@ -24,15 +26,13 @@ class Llama(RAGService, GenericTools):
         self.model_name = model_name
         self.system_prompt = LLAMA_SYSTEM_PROMPT
         try:
-            self.llm = ChatGroq(groq_api_key=GROQ_API_KEY, model_name=self.model_name)
-            self.llm.bind_tools(self.get_generic_tools())
-            self.prompt_template = ChatPromptTemplate.from_messages([
-                self.system_prompt,
-                ("system", "Relevant context (may be partial):\n{context}"),
-                MessagesPlaceholder(variable_name="history"),
-                ("human", "{input}")
-            ])
-            self.chain = self.prompt_template | self.llm
+            self.llm = ChatGroq(groq_api_key=GROQ_API_KEY, model_name=self.model_name, temperature=0.5)
+            self.tools = self.get_generic_tools()
+            
+            # Create the agent using LangGraph prebuilt
+            # This is the modern replacement for AgentExecutor
+            self.agent = create_react_agent(self.llm, self.tools)
+            
         except Exception as e:
             logger.error(f"Error initializing LLaMA model: {str(e)}")
             raise SmartSaarthiException(f"Failed to initialize LLaMA model ({self.model_name})", sys)
@@ -46,62 +46,71 @@ class Llama(RAGService, GenericTools):
 
             history = session_history or []
             
-            # Inject Usage Location into prompt if available
-            augmented_prompt = prompt
+            # Prepare Input Messages
+            input_messages = []
+            
+            # 1. System Prompt with RAG Context
+            sys_content = self.system_prompt.content
+            if context:
+                sys_content += f"\n\nRelevant Context:\n{context}"
+            
             if location:
-                augmented_prompt = f"{prompt}\n[System Note: User is currently at Latitude: {location.get('lat')}, Longitude: {location.get('lng')}. Use this precise location for any 'near me' or distance-related queries.]"
+                sys_content += f"\n\n[System Note: User is currently at Latitude: {location.get('lat')}, Longitude: {location.get('lng')}. Use this precise location for any 'near me' or distance-related queries.]"
+            
+            input_messages.append(SystemMessage(content=sys_content))
+            
+            # 2. History
+            input_messages.extend(history)
+            
+            # 3. New User Message
+            input_messages.append(HumanMessage(content=prompt))
 
-            # First invocation
-            response_msg = self.chain.invoke({
-                "history": history,
-                "input": augmented_prompt,
-                "context": context
-            })
+            # Execute Agent
+            # LangGraph agent expects {"messages": [...]}
+            result = self.agent.invoke({"messages": input_messages})
+            
+            # Result contains all messages including tool calls and outputs
+            output_messages = result.get("messages", [])
+            last_message = output_messages[-1]
+            final_content = last_message.content if hasattr(last_message, "content") else str(last_message)
             
             final_response = {
-                "content": response_msg.content if hasattr(response_msg, "content") else str(response_msg),
+                "content": final_content,
                 "location": None,
                 "action": None
             }
             
-            # Handle Tool Calls
-            if hasattr(response_msg, "tool_calls") and response_msg.tool_calls:
-                for tool_call in response_msg.tool_calls:
-                    if tool_call["name"] == "search_place":
-                        query = tool_call["args"].get("query")
-                        logger.info(f"Executing Google Maps Search for: {query}")
-                        
-                        from tools.google_maps_tool import GoogleMapsTools
-                        tool_instance = GoogleMapsTools()
-                        result = tool_instance.search_place(query)
-                        
-                        if isinstance(result, dict) and result.get("status") == "found":
-                            final_response["location"] = result["location"]
-                            final_response["action"] = "OPEN_MAPS"
-                            final_response["place_name"] = result["name"]
-                            final_response["address"] = result["address"]
-                            final_response["content"] = f"I found {result['name']} at {result['address']}."
-                        else:
-                             final_response["content"] = "I couldn't find that location."
-
-                    elif tool_call["name"] == "find_places_nearby":
-                        keyword = tool_call["args"].get("keyword")
-                        loc = tool_call["args"].get("location")
-                        radius = tool_call["args"].get("radius", 5000)
-                        logger.info(f"Executing Google Maps Nearby Search for: {keyword} near {loc}")
-                        
-                        from tools.google_maps_tool import GoogleMapsTools
-                        tool_instance = GoogleMapsTools()
-                        result = tool_instance.find_places_nearby(keyword, loc, radius)
-                        
-                        if isinstance(result, dict) and result.get("status") == "found":
-                            final_response["location"] = result["location"]
-                            final_response["action"] = "OPEN_MAPS"
-                            final_response["place_name"] = result["name"]
-                            final_response["address"] = result["address"]
-                            final_response["content"] = f"The nearest {keyword} I found is {result['name']} at {result['address']}."
-                        else:
-                             final_response["content"] = f"I couldn't find any {keyword} nearby."
+            # Iterate backwards to find the last successful Google Maps tool output
+            for msg in reversed(output_messages):
+                if isinstance(msg, ToolMessage):
+                    # Tool output is in msg.content, usually as string. We need to parse it if it's JSON.
+                    # Or check msg.name if available, but ToolMessage usually acts on tool_call_id.
+                    # We have to infer from the content or check the preceding AIMessage's tool_calls.
+                    
+                    try:
+                        # Attempt to parse specific known tool outputs
+                        # Since our tool returns a dict, LangChain stringifies it.
+                        content_str = msg.content
+                        if "lat" in content_str and "lng" in content_str and "status" in content_str: # Heuristic check
+                            # Try parsing loose JSON or just dict string representation? 
+                            # If it's real JSON:
+                            import ast
+                            try:
+                                observation = json.loads(content_str)
+                            except:
+                                try:
+                                    observation = ast.literal_eval(content_str)
+                                except:
+                                    observation = {}
+                                    
+                            if isinstance(observation, dict) and observation.get("status") == "found":
+                                final_response["location"] = observation.get("location")
+                                final_response["action"] = "OPEN_MAPS"
+                                final_response["place_name"] = observation.get("name")
+                                final_response["address"] = observation.get("address")
+                                break # Found the latest location
+                    except:
+                        continue
 
             return final_response
 
