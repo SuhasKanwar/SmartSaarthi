@@ -13,7 +13,7 @@ interface AuthContextType {
     isLoading: boolean;
     isAuthenticated: boolean;
     signIn: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
-    signUp: (email: string, password: string, name: string) => Promise<{ success: boolean; message: string }>;
+    signUp: (email: string, password: string, name: string, phoneNumber: string) => Promise<{ success: boolean; message: string }>;
     signOut: () => Promise<void>;
 }
 
@@ -64,9 +64,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
     }, []);
 
-    const signUp = useCallback(async (email: string, password: string, name: string) => {
+    const signUp = useCallback(async (email: string, password: string, name: string, phoneNumber: string) => {
         try {
-            const response = await api.post('/api/auth/signup', { email, password, name });
+            const response = await api.post('/api/auth/signup', { email, password, name, phoneNumber });
             
             if (response.data.success && response.data.data) {
                 const { token, user: userData } = response.data.data;

@@ -27,6 +27,7 @@ model User {
   email         String         @unique
   name          String
   passwordHash  String
+  phoneNumber   String?
   image         String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt

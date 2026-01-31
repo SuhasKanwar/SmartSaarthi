@@ -18,6 +18,7 @@ import { Colors } from '@/constants/theme';
 export default function SignupScreen() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +41,7 @@ export default function SignupScreen() {
         }
 
         setIsLoading(true);
-        const result = await signUp(email.trim(), password, name.trim());
+        const result = await signUp(email.trim(), password, name.trim(), phoneNumber.trim());
         setIsLoading(false);
 
         if (result.success) {
@@ -83,6 +84,16 @@ export default function SignupScreen() {
                             keyboardType="email-address"
                             autoCapitalize="none"
                             autoComplete="email"
+                        />
+
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Phone Number"
+                            placeholderTextColor={Colors.light.tabIconDefault}
+                            value={phoneNumber}
+                            onChangeText={setPhoneNumber}
+                            keyboardType="phone-pad"
+                            autoComplete="tel"
                         />
 
                         <TextInput
