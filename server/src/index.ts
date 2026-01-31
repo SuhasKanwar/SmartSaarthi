@@ -64,7 +64,8 @@ app.get('/api/user', (req: Request, res: Response) => {
                         amount: 120.00,
                         status: "PAID",
                         type: "SWAP",
-                        stationName: "Mayur Vihar Phase 1 Station"
+                        stationName: "Mayur Vihar Phase 1 Station",
+                        url: "https://smartsaarthi-bucket.s3.ap-south-1.amazonaws.com/INV-2024-JAN-02.pdf"
                     },
                     {
                         invoiceId: "INV-2024-JAN-04",
@@ -72,7 +73,8 @@ app.get('/api/user', (req: Request, res: Response) => {
                         amount: 120.00,
                         status: "PAID",
                         type: "SWAP",
-                        stationName: "Laxmi Nagar Hub"
+                        stationName: "Laxmi Nagar Hub",
+                        url: "https://smartsaarthi-bucket.s3.ap-south-1.amazonaws.com/INV-2024-JAN-03.pdf"
                     },
                     {
                         invoiceId: "INV-2024-JAN-03",
@@ -80,7 +82,8 @@ app.get('/api/user', (req: Request, res: Response) => {
                         amount: 500.00,
                         status: "PAID",
                         type: "WALLET_RECHARGE",
-                        paymentMethod: "UPI"
+                        paymentMethod: "UPI",
+                        url: "https://smartsaarthi-bucket.s3.ap-south-1.amazonaws.com/INV-2024-JAN-04.pdf"
                     },
                     {
                         invoiceId: "INV-2024-JAN-02",
@@ -88,7 +91,8 @@ app.get('/api/user', (req: Request, res: Response) => {
                         amount: 110.00,
                         status: "PAID",
                         type: "SWAP",
-                        stationName: "Noida Sec 18 Point"
+                        stationName: "Noida Sec 18 Point",
+                        url: "https://smartsaarthi-bucket.s3.ap-south-1.amazonaws.com/INV-2024-JAN-05.pdf"
                     },
                     {
                         invoiceId: "INV-2024-JAN-01",
@@ -96,7 +100,8 @@ app.get('/api/user', (req: Request, res: Response) => {
                         amount: 120.00,
                         status: "PAID",
                         type: "SWAP",
-                        stationName: "Mayur Vihar Phase 1 Station"
+                        stationName: "Mayur Vihar Phase 1 Station",
+                        url: "https://smartsaarthi-bucket.s3.ap-south-1.amazonaws.com/INV-2024-JAN-05.pdf"
                     }
                 ],
                 upcomingDues: {
