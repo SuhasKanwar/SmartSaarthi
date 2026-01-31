@@ -13,15 +13,15 @@ export default function AppLayout() {
             }}
         >
             <Tabs.Screen
-                name="index"
-                options={{
-                    title: 'Home',
-                }}
-            />
-            <Tabs.Screen
                 name="voice"
                 options={{
                     title: 'Voice',
+                }}
+            />
+            <Tabs.Screen
+                name="index"
+                options={{
+                    title: 'Home',
                 }}
             />
             <Tabs.Screen

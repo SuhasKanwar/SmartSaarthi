@@ -7,6 +7,7 @@ import { PORT } from "./lib/config";
 
 const app = express();
 
+
 app.use(cors({
     origin: "*",
     credentials: true,
@@ -24,8 +25,10 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 import authRouter from "./routes/authRouter";
+import chatRouter from "./routes/chatRouter";
 import { authenticateMiddleware } from "./middlewares/authentication";
 app.use('/api/auth', authRouter);
+app.use('/api/chat', chatRouter);
 
 app.listen(PORT, (err) => {
     if (err) {

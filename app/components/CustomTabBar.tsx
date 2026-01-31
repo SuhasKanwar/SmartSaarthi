@@ -83,9 +83,8 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
         {validRoutes.map((route, index) => {
           const { options } = descriptors[route.key];
           
-          // Check if this route is focused by comparing keys
-          const currentActiveKey = state.routes[state.index].key;
-          const isRouteFocused = currentActiveKey === route.key;
+          // Check if this route is focused by looking at the index of the route in the state
+          const isRouteFocused = state.index === state.routes.indexOf(route);
 
           const configItem = navigationConfig.find(item => item.route === route.name);
           if (!configItem) return null;
