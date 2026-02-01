@@ -127,6 +127,49 @@ app.get('/api/user', (req: Request, res: Response) => {
                         }
                     ],
                     pricingClarification: "Premium plan (₹2,999/year) includes unlimited swaps up to 300 km/month. Taxes and extra distance charges apply. Auto-renew enabled; cancellations before nextRenewalDate prevent further charges. Refunds are prorated based on remaining days."
+                },
+                leaves: {
+                    leaveBalance: {
+                        total: 24,
+                        paid: 18,
+                        sick: 4,
+                        casual: 2,
+                        earned: 0
+                    },
+                    activeLeaves: [
+                        {
+                            leaveId: "LV-2025-03-01",
+                            type: "SICK",
+                            startDate: "2025-03-01",
+                            endDate: "2025-03-03",
+                            status: "APPROVED",
+                            days: 3,
+                            note: "Flu"
+                        }
+                    ],
+                    pendingRequests: [
+                        {
+                            leaveId: "LV-2025-04-10",
+                            type: "CASUAL",
+                            startDate: "2025-04-10",
+                            endDate: "2025-04-12",
+                            status: "PENDING",
+                            days: 3,
+                            appliedOn: "2025-03-28T09:00:00Z"
+                        }
+                    ],
+                    history: [
+                        {
+                            leaveId: "LV-2024-11-02",
+                            type: "PAID",
+                            startDate: "2024-11-02",
+                            endDate: "2024-11-04",
+                            status: "APPROVED",
+                            days: 3,
+                            approvedBy: "HR-001"
+                        }
+                    ],
+                    policySummary: "Employees are entitled to 24 leaves/year (including sick and casual). Carry forward up to 5 days. Approvals follow company policy."
                 }
             }
         });
