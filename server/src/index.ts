@@ -26,7 +26,6 @@ app.get('/', (req: Request, res: Response) => {
 
 import authRouter from "./routes/authRouter";
 import chatRouter from "./routes/chatRouter";
-import { authenticateMiddleware } from "./middlewares/authentication";
 app.use('/api/auth', authRouter);
 app.use('/api/chat', chatRouter);
 app.get('/api/user', (req: Request, res: Response) => {
@@ -107,6 +106,27 @@ app.get('/api/user', (req: Request, res: Response) => {
                 upcomingDues: {
                     amount: 0.00,
                     dueDate: null
+                },
+                subscription: {
+                    planName: "Premium",
+                    status: "ACTIVE",
+                    autoRenew: true,
+                    billingCycle: "ANNUAL",
+                    price: 2999.00,
+                    currency: "INR",
+                    validFrom: "2024-01-01T00:00:00Z",
+                    validTo: "2025-01-01T00:00:00Z",
+                    nextRenewalDate: "2025-01-01T00:00:00Z",
+                    renewals: [
+                        {
+                            renewalId: "RNL-2024-01-01",
+                            date: "2024-01-01T00:00:00Z",
+                            amount: 2999.00,
+                            method: "UPI",
+                            status: "SUCCESS"
+                        }
+                    ],
+                    pricingClarification: "Premium plan (₹2,999/year) includes unlimited swaps up to 300 km/month. Taxes and extra distance charges apply. Auto-renew enabled; cancellations before nextRenewalDate prevent further charges. Refunds are prorated based on remaining days."
                 }
             }
         });
