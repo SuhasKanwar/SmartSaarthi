@@ -1,2 +1,2 @@
-export const HTTP_SERVER_BASE_URL: string = process.env.NODE_ENV === "development" ? "http://192.168.221.66:9000" : "http://localhost:9000";
-export const MICROSERVICE_BASE_URL: string = process.env.NODE_ENV === "development" ? "http://192.168.221.66:8000" : "http://localhost:8000";
+export const HTTP_SERVER_BASE_URL: string = process.env.NODE_ENV === "development" ? "http://192.168.221.135:9000" : "http://localhost:9000";
+export const MICROSERVICE_BASE_URL: string = process.env.NODE_ENV === "development" ? "http://192.168.221.135:8000" : "http://localhost:8000";

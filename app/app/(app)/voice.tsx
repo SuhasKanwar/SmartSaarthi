@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Orb from '@/components/Orb';
 import { Palette } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { useAudioPlayer, useAudioPlayerStatus, useAudioRecorder, requestRecordingPermissionsAsync } from 'expo-audio';
+import { useAudioPlayer, useAudioPlayerStatus, useAudioRecorder, requestRecordingPermissionsAsync, RecordingPresets, setAudioModeAsync } from 'expo-audio';
 import * as Speech from 'expo-speech';
 import * as DocumentPicker from 'expo-document-picker';
 import { createConversation, sendMessage, getConversations, deleteConversation, renameConversation, getConversationMessages } from '@/lib/api';
@@ -58,6 +58,21 @@ export default function VoiceScreen() {
     initConversation();
     fetchHistory();
     requestLocationPermission();
+    
+    // Configure Audio Mode
+    const configureAudio = async () => {
+        try {
+            await setAudioModeAsync({
+                allowsRecording: true,
+                playsInSilentMode: true,
+                shouldPlayInBackground: false,
+                interruptionMode: 'mixWithOthers'
+            });
+        } catch (e) {
+            console.error("Failed to set audio mode", e);
+        }
+    };
+    configureAudio();
   }, []);
 
   const requestLocationPermission = async () => {
@@ -281,54 +296,36 @@ export default function VoiceScreen() {
   }, [messages, isChatOpen]);
 
   // Audio Recording
-  const recordingOptions: any = {
-      extension: '.m4a',
-      sampleRate: 44100,
-      numberOfChannels: 2,
-      bitRate: 128000,
-      android: {
-          extension: '.m4a',
-          outputFormat: 'mpeg4',
-          audioEncoder: 'aac',
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: 128000,
-      },
-      ios: {
-          extension: '.m4a',
-          audioQuality: 127,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: 128000,
-          linearPCMBitDepth: 16,
-          linearPCMIsBigEndian: false,
-          linearPCMIsFloat: false,
-      },
-      web: {
-          mimeType: 'audio/webm',
-          bitsPerSecond: 128000,
-      },
-  };
-
-  const recorder = useAudioRecorder(recordingOptions, (status) => {
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY, (status) => {
      // Optional: track duration or metering here if needed
   });
 
   const toggleListening = async () => {
       if (isListening) {
-          await recorder.stop();
+          try {
+              await recorder.stop();
+          } catch (e) {
+              console.error("Error stopping recorder", e);
+          }
           setIsListening(false);
           
           if (recorder.uri) {
               sendVoiceMessage(recorder.uri);
           }
       } else {
-          const perm = await requestRecordingPermissionsAsync();
-          if (perm.granted) {
-             setIsListening(true);
-             recorder.record();
-          } else {
-             Alert.alert("Permission required", "Microphone access is needed.");
+          try {
+              const perm = await requestRecordingPermissionsAsync();
+              if (perm.granted) {
+                 await recorder.prepareToRecordAsync(RecordingPresets.HIGH_QUALITY);
+                 recorder.record();
+                 setIsListening(true);
+              } else {
+                 Alert.alert("Permission required", "Microphone access is needed.");
+              }
+          } catch (e) {
+              console.error("Error starting recording", e);
+              Alert.alert("Error", "Could not start recording.");
+              setIsListening(false);
           }
       }
   };
